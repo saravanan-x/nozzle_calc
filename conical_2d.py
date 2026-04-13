@@ -1,129 +1,160 @@
-     #Conical Nozzles
-
-rt = dt / 2
-re = de / 2 
-e = ae / at
-
-throat_angle = 17
-
-theta = np.radians(throat_angle) 
-
-r1 = 1.5 * rt
-Re = np.sqrt(e) * rt
-rn = rt + r1 * (1 - np.cos(theta))
-
-# arc length
-l1 = r1 * np.sin(theta)
+#Conical Nozzles
+import numpy as np
+import math
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+import importlib
 
 
-# CONVERTING MILLIMETERS TO METERS FOR PLOTTING
-cl = lc_mm / 1000              # Chamber length converted to meters
-cr = (cd_mm / 2) / 1000        # Chamber radius converted to meters
-con_l = (conv_mm / 1000) - l1  # Convergent length converted to meters
+def conical_2d(dt_mm, de_mm, ae, at, lc_mm, cd_mm, conv_mm):
+    
+    dt = dt_mm/1000 # mm to m
+    de = de_mm/1000 #mm - m
+    rt = dt / 2
+    re = de / 2 
+    e = ae / at
 
-# conical length
-ln = (rt * (np.sqrt(e) - 1) + r1 * (np.cos(theta) - 1)) / np.tan(theta)
+    throat_angle = 17
 
-# total length
-l = l1 + ln
+    theta = np.radians(throat_angle) 
 
-print("r1 =", r1 * 1000)
-print("cl =", cl * 1000)
-print("cr =", cr * 1000)
-print("covergen length =", con_l * 1000)
-print("e =", e * 1000)
-print("rt =", rt * 1000)
-print("re =", re * 1000)
-print("l1 =", l1 * 1000)
-print("Re =", Re * 1000)
-print("rn =", rn * 1000)
-print("ln =", ln * 1000)
-print("Total length =", l * 1000)
+    r1 = 1.5 * rt
+    Re = np.sqrt(e) * rt
+    rn = rt + r1 * (1 - np.cos(theta))
+
+    # arc length
+    l1 = r1 * np.sin(theta)
 
 
-# --- PLOTTING CODE ---
-fig, ax = plt.subplots(figsize=(16, 10)) 
+    # CONVERTING MILLIMETERS TO METERS FOR PLOTTING
+    cl = lc_mm / 1000              # Chamber length converted to meters
+    cr = (cd_mm / 2) / 1000        # Chamber radius converted to meters
+    con_l = (conv_mm / 1000) - l1  # Convergent length converted to meters
 
-ax.set_aspect('equal', adjustable='box')
-ax.axis('off') 
+    # conical length
+    ln = (rt * (np.sqrt(e) - 1) + r1 * (np.cos(theta) - 1)) / np.tan(theta)
 
-pad = Re * 0.2
+    # total length
+    l = l1 + ln
 
-# GEOMETRY CALCULATIONS
-x_chamber_start = -(cl + con_l + l1)
-x_chamber_end = -(con_l + l1)
-x_conv_end = -l1
-y_conv_end = rt + r1 * (1 - np.cos(theta))
-
-def plot_nozzle_side(sign=1):
-    ax.plot([x_chamber_start, x_chamber_end], [sign*cr, sign*cr], 'k-', linewidth=2.5)
-    ax.plot([x_chamber_end, x_conv_end], [sign*cr, sign*y_conv_end], 'k-', linewidth=2.5)
-    t_vals_conv = np.linspace(-np.pi/2 - theta, -np.pi/2, 100)
-    ax.plot(r1 * np.cos(t_vals_conv), sign*(r1 * np.sin(t_vals_conv) + (rt + r1)), 'k-', linewidth=2.5)
-    t_vals = np.linspace(-np.pi/2, -np.pi/2 + theta, 100)
-    ax.plot(r1 * np.cos(t_vals), sign*(r1 * np.sin(t_vals) + (rt + r1)), 'k-', linewidth=2.5)
-    ax.plot([l1, l], [sign*rn, sign*Re], 'k-', linewidth=2.5)
-
-plot_nozzle_side(sign=1)
-plot_nozzle_side(sign=-1)
-
-ax.plot([x_chamber_start - pad, l + pad], [0, 0], color='gray', linestyle='-.', linewidth=1.5)
-ax.text(l + pad*1.2, 0, r'$\mathbb{CL}$', fontsize=20, fontweight='bold', va='center')
-
-# CONSTRUCTION LINES
-ax.plot([0, 0], [-(rt+pad), rt+pad], 'k--', linewidth=0.8, alpha=0.5) 
-ax.plot([l1, l1], [0, rn + pad], 'k--', linewidth=0.8, alpha=0.5)      
-ax.plot([l, l], [0, Re + pad], 'k--', linewidth=0.8, alpha=0.5)        
-
-ax.plot([0, l1], [rt + r1, rn], 'k-', linewidth=1, alpha=0.6)
-ax.text(l1/2, rt + r1/2, r'$R_1$', fontsize=15, ha='right')
-
-arc_alpha = patches.Arc((l1, rn), l*0.15, l*0.15, theta1=0, theta2=np.degrees(theta), color='red', linewidth=1.5)
-ax.add_patch(arc_alpha)
-ax.text(l1 + l*0.08, rn + pad*0.2, r'$\alpha$', fontsize=16, color='red', fontweight='bold')
-
-def draw_dim(x1, y1, x2, y2, text, color='blue', off=0):
-    ax.annotate('', xy=(x1, y1), xytext=(x2, y2), arrowprops=dict(arrowstyle='<->', color=color, lw=1.5))
-    if x1 == x2: 
-        ax.text(x1 - pad*0.3, (y1+y2)/2, text, color=color, fontsize=14, va='center', ha='right', fontweight='bold')
-    else: 
-        ax.text((x1+x2)/2, y1 - off, text, color=color, fontsize=14, ha='center', va='top', fontweight='bold', bbox=dict(facecolor='white', edgecolor='none', alpha=0.7))
-
-draw_dim(-pad*0.5, 0, -pad*0.5, rt, r'$R_t$')
-draw_dim(l1 - pad*0.2, 0, l1 - pad*0.2, rn, r'$R_N$')
-draw_dim(l + pad*0.5, 0, l + pad*0.5, Re, r'$R_e$')
-
-draw_dim(0, -pad*1.5, l1, -pad*1.5, r'$L_1$', off=pad*0.2)
-draw_dim(l1, -pad*1.5, l, -pad*1.5, r'$L_N$', off=pad*0.2)
-draw_dim(0, -pad*3.0, l, -pad*3.0, r'$L_{total}$', off=pad*0.2)
-
-ax.plot(l1, rn, 'ro', markersize=6)
-ax.text(l1, rn + pad*0.3, 'N', color='red', fontsize=16, fontweight='bold', ha='center')
+    # print("r1 =", r1 * 1000)
+    # print("cl =", cl * 1000)
+    # print("cr =", cr * 1000)
+    # print("covergen length =", con_l * 1000)
+    # print("e =", e * 1000)
+    # print("rt =", rt * 1000)
+    # print("re =", re * 1000)
+    # print("l1 =", l1 * 1000)
+    # print("Re =", Re * 1000)
+    # print("rn =", rn * 1000)
+    # print("ln =", ln * 1000)
+    # print("Total length =", l * 1000)
 
 
-# DATA SUMMARY TABLE ON THE DIAGRAM
-stats_text = (
-    f"DIMENSIONS (mm):\n"
-    f"r1    : {r1*1000:.2f} MM\n"
-    f"cl    : {cl*1000:.2f} MM\n"
-    f"cr    : {cr*1000:.2f} MM\n"
-    f"Con L: {con_l*1000:.2f} MM\n"
-    f"rt    : {rt*1000:.2f} MM\n"
-    f"re    : {re*1000:.2f} MM\n"
-    f"L1    : {l1*1000:.2f} MM\n"
-    f"Re    : {Re*1000:.2f} MM\n"
-    f"rn    : {rn*1000:.2f} MM\n"
-    f"ln    : {ln*1000:.2f} MM\n"
-    f"Tot L : {l*1000:.2f} MM\n"
-)
+        # --- PLOTTING CODE ---
+    fig, ax = plt.subplots(figsize=(16, 9)) 
 
-# Place the text box in the upper left corner
-ax.text(0.02, 0.98, stats_text, transform=ax.transAxes, fontsize=12,
-        verticalalignment='top', family='monospace', fontweight='bold',
-        bbox=dict(boxstyle='round,pad=0.5', facecolor='none', edgecolor='black', alpha=0.5))
+    ax.set_aspect('equal')
+    ax.axis('off') 
 
-ax.set_xlim(x_chamber_start - pad*2, l + pad*3)
-ax.set_ylim(-(Re + pad*4), max(cr, rt + r1) + pad*2)
+    pad = Re * 0.25
 
-plt.tight_layout()
-plt.show() 
+    # ---------------- GEOMETRY ----------------
+    x_chamber_start = -(cl + con_l + l1)
+    x_chamber_end   = -(con_l + l1)
+    x_conv_end      = -l1
+
+    y_conv_end = rt + r1 * (1 - np.cos(theta))
+
+    # ---------------- NOZZLE SHAPE ----------------
+    def plot_nozzle(sign=1):
+
+        # Chamber
+        ax.plot([x_chamber_start, x_chamber_end], 
+                [sign*cr, sign*cr], linewidth=3)
+
+        # Convergent line
+        ax.plot([x_chamber_end, x_conv_end], 
+                [sign*cr, sign*y_conv_end], linewidth=3)
+
+        # Convergent arc
+        t_conv = np.linspace(-np.pi/2 - theta, -np.pi/2, 100)
+        x_arc = r1 * np.cos(t_conv)
+        y_arc = r1 * np.sin(t_conv) + (rt + r1)
+
+        ax.plot(x_arc, sign*y_arc, linewidth=3)
+
+        # Divergent (straight or bell)
+        ax.plot([l1, l], [sign*rn, sign*Re], linewidth=3)
+
+
+    # Draw both sides
+    plot_nozzle(1)
+    plot_nozzle(-1)
+
+    # ---------------- CENTERLINE ----------------
+    ax.plot([x_chamber_start - pad, l + pad], [0, 0], linestyle='--')
+    ax.text(l + pad*1.2, 0, "CL", fontsize=16, va='center')
+
+    # ---------------- KEY POINTS ----------------
+    ax.scatter([0, l1, l], [rt, rn, Re])
+
+    ax.text(0, rt + pad*0.3, "Throat", ha='center')
+    ax.text(l1, rn + pad*0.3, "N", ha='center')
+    ax.text(l, Re + pad*0.3, "Exit", ha='center')
+
+    # ---------------- DIMENSIONS ----------------
+    def dim_line(x1, y1, x2, y2, text):
+
+        ax.annotate('', xy=(x1, y1), xytext=(x2, y2),
+                    arrowprops=dict(arrowstyle='<->', lw=1.5))
+
+        ax.text((x1+x2)/2, (y1+y2)/2,
+                text, ha='center', fontsize=11,
+                bbox=dict(facecolor='white', alpha=0.7, edgecolor='none'))
+
+    # Radii
+    dim_line(-pad*0.5, 0, -pad*0.5, rt, f"Rt\n{rt*1000:.1f} mm")
+    dim_line(l1 - pad*0.3, 0, l1 - pad*0.3, rn, f"Rn\n{rn*1000:.1f} mm")
+    dim_line(l + pad*0.5, 0, l + pad*0.5, Re, f"Re\n{Re*1000:.1f} mm")
+
+    # Lengths
+    dim_line(0, -Re*0.35, l1, -Re*0.35, f"L1\n{l1*1000:.1f} mm")
+    dim_line(l1, -Re*0.35, l, -Re*0.35, f"Ln\n{(l-l1)*1000:.1f} mm")
+    dim_line(0, -Re*0.6, l, -Re*0.6, f"Ltotal\n{l*1000:.1f} mm")
+
+    # ---------------- ANGLE ----------------
+    arc = patches.Arc((l1, rn), l*0.15, l*0.15,
+                    theta1=0, theta2=np.degrees(theta))
+    ax.add_patch(arc)
+
+    ax.text(l1 + l*0.07, rn + pad*0.3,
+            r'$\theta$', fontsize=14)
+
+    # ---------------- DATA BOX ----------------
+    stats_text = (
+        f"NOZZLE DATA (mm)\n\n"
+        f"Chamber L : {cl*1000:.1f}\n"
+        f"Chamber R : {cr*1000:.1f}\n"
+        f"Conv L    : {con_l*1000:.1f}\n\n"
+        f"Rt        : {rt*1000:.1f}\n"
+        f"Rn        : {rn*1000:.1f}\n"
+        f"Re        : {Re*1000:.1f}\n\n"
+        f"L1        : {l1*1000:.1f}\n"
+        f"Ln        : {(l-l1)*1000:.1f}\n"
+        f"Total L   : {l*1000:.1f}"
+    )
+
+    ax.text(0.02, 0.98, stats_text,
+            transform=ax.transAxes,
+            fontsize=11,
+            verticalalignment='top',
+            family='monospace',
+            bbox=dict(boxstyle='round', alpha=0.4))
+
+    # ---------------- LIMITS ----------------
+    ax.set_xlim(x_chamber_start - pad*2, l + pad*3)
+    ax.set_ylim(-(Re + pad*3), max(cr, rt + r1) + pad*2)
+
+    plt.tight_layout()
+    plt.show()

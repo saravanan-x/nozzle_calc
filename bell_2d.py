@@ -5,8 +5,22 @@ import matplotlib.patches as patches
 import importlib
 import bell_nozzle as bn
 
+
 def bell_2d(r1, cl, cr, con_l, e, rt, re, l1, Re, rn, ln, r_start, r_exit, slope_N, slope_exit, tita_n, tita_e, l, theta, x, xn, rx, yn, θn):
   
+
+    # ---------------- GEOMETRY ----------------
+    x_chamber_start = -(cl + con_l + l1)
+    x_chamber_end   = -(con_l + l1)
+    x_conv_end      = -l1
+
+    y_conv_end = rt + r1 * (1 - np.cos(theta))
+
+    # PRESERVED CONVERGENT GEOMETRY
+    r1_conv = 1.5 * rt
+    l1_conv = r1_conv * np.sin(theta)
+    y_conv_end = rt + r1_conv * (1 - np.cos(theta))
+
     plt.figure(figsize=(14,6))
 
     # ---------- CHAMBER ----------
