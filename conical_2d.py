@@ -4,7 +4,7 @@ import math
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import importlib
-
+import os
 
 def conical_2d(dt_mm, de_mm, ae, at, lc_mm, cd_mm, conv_mm):
     
@@ -157,4 +157,12 @@ def conical_2d(dt_mm, de_mm, ae, at, lc_mm, cd_mm, conv_mm):
     ax.set_ylim(-(Re + pad*3), max(cr, rt + r1) + pad*2)
 
     plt.tight_layout()
+
+    # SAVE IMAGE
+    save_path = "/home/saravanan/Music/nozzle.py/result"
+    os.makedirs(save_path, exist_ok=True)
+
+    file_path = os.path.join(save_path, "conical_nozzle.png")
+    plt.savefig(file_path, dpi=300, bbox_inches='tight')
+
     plt.show()

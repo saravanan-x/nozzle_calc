@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import importlib
 import bell_nozzle as bn
+import os
 
 def bell_3d(r1, cl, cr, con_l, e, rt, re, l1, Re, rn, ln, r_start, r_exit, slope_N, slope_exit, tita_n, tita_e, l, theta, x, xn, rx, yn, θn):
     # ploting the graph
@@ -123,4 +124,11 @@ def bell_3d(r1, cl, cr, con_l, e, rt, re, l1, Re, rn, ln, r_start, r_exit, slope
     ax2.view_init(elev=15, azim=-60)
 
     plt.tight_layout()
+    # SAVE IMAGE
+    save_path = "/home/saravanan/Music/nozzle.py/result"
+    os.makedirs(save_path, exist_ok=True)
+
+    file_path = os.path.join(save_path, "3D-Bell_nozzle.png")
+    plt.savefig(file_path, dpi=300, bbox_inches='tight')
+    
     plt.show()

@@ -9,6 +9,7 @@ import bell_3d as b3
 import bell_2d as b2
 import conical_2d as c2
 import export_plot as exp
+import result as rs
 
 importlib.reload(noz_geo)
 
@@ -74,6 +75,11 @@ c2.conical_2d(dt_mm, de_mm, ae, at, lc_mm, cd_mm, conv_mm)
 #------------solidwork plot values ---------
 exp.export_plot(tita_n, r1, rt, x, rx)
 
+#--------------result excel--------
+rs.result(f, m, cd_mm, lc_mm, conv_mm, dt_mm, div_mm, de_mm, total_mm,
+    ar, ρ0, vt, ρt, me, mg, mc, ep, et, v_e, isp, m0, F)
+
+
 #-----1.nozzle_geomentry-----------
 
 print(f"Exit velocity           : {ve:.2f} m/s")
@@ -103,8 +109,8 @@ print(f"Density                 : {rho:.4f} kg/m³")
 #-------------3.Flow Properties---------
 print("\n-----Flow properties--------")
 print(f"Exit Mach number        : {me:.2f}")
-print(f"Ratio of area           : {Ar}")
-print(f"Nozzle area ratio       : {ar}")
+print(f"Ratio of area           : {Ar:.2f}")
+print(f"Nozzle area ratio       : {ar:.2f}")
 print(f"Stagnation Density      : {ρ0:.2f} kg/m^3")
 print(f"Throart Velocity        : {vt:.2f} m/s")
 print(f"Throat density          : {ρt:.2f} kg/m^3")
@@ -137,4 +143,7 @@ print("At N (radius)        :", r_start)
 print("At Exit (radius)     :", r_exit, "Expected:", re)
 print("Slope at N           :", slope_N, "Expected:", np.tan(tita_n))
 print("Slope at Exit        :", slope_exit, "Expected:", np.tan(tita_e))
-print(f"LENGTH (Rao method) :{l*1000}")
+print(f"LENGTH (Rao method)  : {l*1000}")
+
+print("\n CURVE PLOT FOR SOLIDWORKS EXCEL / TEXT SAVED ")
+print("\n Result Saved ")

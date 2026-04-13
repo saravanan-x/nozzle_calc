@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import importlib
 import bell_nozzle as bn
-
+import os
 
 def bell_2d(r1, cl, cr, con_l, e, rt, re, l1, Re, rn, ln, r_start, r_exit, slope_N, slope_exit, tita_n, tita_e, l, theta, x, xn, rx, yn, θn):
   
@@ -124,4 +124,11 @@ def bell_2d(r1, cl, cr, con_l, e, rt, re, l1, Re, rn, ln, r_start, r_exit, slope
     plt.axis("equal")
     plt.grid(alpha=0.2)
 
+    # SAVE IMAGE
+    save_path = "/home/saravanan/Music/nozzle.py/result"
+    os.makedirs(save_path, exist_ok=True)
+
+    file_path = os.path.join(save_path, "Bell_nozzle.png")
+    plt.savefig(file_path, dpi=300, bbox_inches='tight')
+  
     plt.show()
